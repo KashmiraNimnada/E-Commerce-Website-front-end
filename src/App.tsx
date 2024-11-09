@@ -7,21 +7,26 @@ import Product from './pages/Product'
 import Order from './pages/orders/Order'
 import CreateOrder from './pages/orders/CreateOrder'
 import EditOrder from './pages/orders/EditOrder'
+import { AuthProvider } from './context/AuthContext'
+import Login from './pages/auth/Login'
 
 // parent component
 function App() {
   return (
-    <BrowserRouter>
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/category" element={<Category />} />
-      <Route path="/product" element={<Product />} />
-      <Route path="/order" element={<Order />} />
-      <Route path="/order/create" element={<CreateOrder />} />
-      <Route path="/order/:id/editOrder" element={<EditOrder />} />
-    </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/category" element={<Category />} />
+          <Route path="/product" element={<Product />} />
+          <Route path="/order" element={<Order />} />
+          <Route path="/order/create" element={<CreateOrder />} />
+          <Route path="/order/:id/editOrder" element={<EditOrder />} />
+          <Route path="/auth/login" element={<Login />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   )
 }
 
