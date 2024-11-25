@@ -3,6 +3,8 @@ import { useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import OrderType from "../../types/OrderType"
 import ProductType from "../../types/ProductType"
+import { useAuth } from "../../context/AuthContext"
+import NavBar from "../NavBar"
 
 function EditOrder() {
 
@@ -10,28 +12,41 @@ function EditOrder() {
     const [order,setOrder] = useState<OrderType>()
     const [products,setProducts] = useState<ProductType[]>([])
 
+    const {isAuthenticated,jwtToken} = useAuth();
+
+    const config = {
+        headers: {
+            Authorization: `Bearer ${jwtToken}`
+        }  
+    }
+
     useEffect(() => {
-            axios.get(`http://localhost:8081/orders/${id}`)
+        if (isAuthenticated) {
+            axios.get(`http://localhost:8081/orders/${id}`,config)
                 .then(function(response){
                     console.log(response)
                     setOrder(response.data)
                 }).catch(function(error){
                     console.log(error)
                 })
-            axios.get("http://localhost:8081/products")
+            axios.get("http://localhost:8081/products",config)
                 .then(function(response){
                     console.log(response)
                     setProducts(response.data)
                 }).catch(function(error){
                     console.log(error)
                 })
+        }
+            
 
     },[])
 
     const navigate = useNavigate()
 
     return (
-    <div className="flex bg-gradient-to-r from-white to-slate-50 "> 
+    <div className="bg-gradient-to-r from-white to-slate-50 ">
+        <NavBar /> 
+        <div className="flex">
         <div className="col-lg-8">
             <h1 className="text-3xl font-black text-pink-900 ml-5 pl-5 mb-5 mt-5">Add products to order #{id}</h1>
                 {order &&
@@ -58,7 +73,7 @@ function EditOrder() {
                                                 <td className="border border-slate-400 ... px-2 text-sm text-center">{product.price}</td>
                                                 <td className="border border-slate-400 ... px-2 text-sm text-center py-1">
                                                     <button className="px-2 py-1 border bg-red-600 hover:bg-red-800 rounded-3xl text-white text-xs" onClick={() => {
-                                                        axios.delete(`http://localhost:8081/orders/${id}/product/${product.id}`)
+                                                        axios.delete(`http://localhost:8081/orders/${id}/product/${product.id}`,config)
                                                             .then(function(response){
                                                                 console.log(response)
                                                                 setOrder(response.data)
@@ -97,7 +112,7 @@ function EditOrder() {
                                         productId : product.id,
                                         qty : 1
                                     }
-                                    axios.post(`http://localhost:8081/orders/${id}/addProduct`,data)
+                                    axios.post(`http://localhost:8081/orders/${id}/addProduct`,data,config)
                                         .then(function(response){
                                             console.log(response)
                                             setOrder(response.data)
@@ -113,7 +128,7 @@ function EditOrder() {
             </div>
             
         </div>
-
+        </div>
     </div>
         
     )

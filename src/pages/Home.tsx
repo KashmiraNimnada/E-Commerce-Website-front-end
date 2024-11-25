@@ -1,10 +1,10 @@
+import Profile from "./Profile";
 
 function Home() {
 
-
   return (
     <div>
-      <h1>Welcome to Kashmira Supermart</h1>      
+      <Profile />
     </div>
   )
 }

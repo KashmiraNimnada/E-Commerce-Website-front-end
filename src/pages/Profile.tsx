@@ -1,7 +1,13 @@
+import NavBar from "./NavBar";
+
+
 function Profile() {
     return (
         <div>
-            <h1>Profile</h1>
+            <NavBar />
+            <div>
+                Profile
+            </div>
         </div>
     )
 }

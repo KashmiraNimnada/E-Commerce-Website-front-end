@@ -2,8 +2,12 @@ import { useEffect, useState } from "react"
 import ProductType from "../types/ProductType"
 import axios from "axios"
 import CategoryType from "../types/CategoryType"
+import { useAuth } from "../context/AuthContext"
+import NavBar from "./NavBar"
 
 function Product() {
+
+    const {isAuthenticated,jwtToken} = useAuth();
 
     const [products,setProducts] = useState<ProductType[]>([])
     const [categories,setCategories] = useState<CategoryType[]>([])
@@ -16,21 +20,33 @@ function Product() {
 
     const [productId,setProductId] = useState<number>()
 
+    const config = {
+        headers: {
+            Authorization: `Bearer ${jwtToken}`
+        }  
+    }
+
     async function loadProducts() {
-        const response = await axios.get("http://localhost:8081/products")
+        console.log(config);
+        const response = await axios.get("http://localhost:8081/products",config)
         console.log(response)
         setProducts(response.data)
     }
 
     async function loadCategories() {
-        const response = await axios.get("http://localhost:8081/categories")
+        console.log(config);
+        const response = await axios.get("http://localhost:8081/categories",config)
         setCategories(response.data)
     }
 
     useEffect(function() {
-        loadProducts()
-        loadCategories()
-    },[])
+        console.log(isAuthenticated+"asda");
+        if(isAuthenticated){
+            console.log(isAuthenticated);
+            loadProducts();
+            loadCategories();
+        }
+    },[isAuthenticated])
 
     function handleProductName(event: any) {
         setProductName(event.target.value)
@@ -61,7 +77,7 @@ function Product() {
 
     async function deleteProduct(id: number) {
         try {
-            const response = await axios.delete(`http://localhost:8081/products/${id}`)
+            const response = await axios.delete(`http://localhost:8081/products/${id}`,config)
             console.log(response)
             loadProducts()
         } catch (error: any) {
@@ -78,7 +94,7 @@ function Product() {
         }
 
         try {
-            const response = await axios.put(`http://localhost:8081/products/${productId}`,data_2)
+            const response = await axios.put(`http://localhost:8081/products/${productId}`,data_2,config)
             console.log(response)
             loadProducts()
             setProductName("")
@@ -102,7 +118,7 @@ function Product() {
         }
 
         try {
-            await axios.post("http://localhost:8081/products",data)
+            await axios.post("http://localhost:8081/products",data,config)
             loadProducts()
             setProductName("")
             setProductPrice(0)
@@ -114,13 +130,12 @@ function Product() {
         }
 
     }
-
     return (
-        <div className="container mx-auto py-5">
+        <div className="mx-auto">
+            <NavBar />
+            <h1 className="text-3xl font-bold text-pink-900 mt-5 ml-5">Products</h1>
 
-            <h1 className="text-3xl font-bold text-pink-900 mb-10">Products</h1>
-
-            <table className="table-width mb-5">
+            <table className="table-width mb-5 mt-5 ml-5">
                 <thead className="border bg-slate-200">
                     <tr>
                         <th className="p-2 text-sm border border-slate-400">Product ID</th>
@@ -147,7 +162,7 @@ function Product() {
                 </tbody>
             </table>
 
-            <div className="mt-14 w-[550px] pt-10 pb-4 pl-5 border bg-slate-200 shadow">
+            <div className="mt-14 w-[550px] pt-10 pb-4 pl-5 border bg-slate-200 shadow ml-5">
                 <form className="">
                         <div className="grid grid-cols-2 grid-rows-1 mb-5 w-1/2">
                             <label className="pl-5 font-sans">Product Name</label>
@@ -179,7 +194,7 @@ function Product() {
                         ) : (
                             <button type="button" className="border p-2 border-slate-900 mb-1 bg-slate-700 text-white rounded-2xl hover:bg-slate-950 text-sm shadow" onClick={handleSubmitProduct}>Create Product</button>
                         )}
-
+        
                         
                 </form>
             </div>

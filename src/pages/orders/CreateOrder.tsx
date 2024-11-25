@@ -2,19 +2,31 @@ import axios from "axios"
 import { useEffect, useState } from "react"
 import ProductType from "../../types/ProductType"
 import { useNavigate } from "react-router-dom"
+import { useAuth } from "../../context/AuthContext"
+import NavBar from "../NavBar"
 
 function CreateOrder() {
 
     const [products,setProducts] = useState<ProductType[]>([])
 
+    const {isAuthenticated,jwtToken} = useAuth();
+
+    const config = {
+        headers: {
+            Authorization: `Bearer ${jwtToken}`
+        }  
+    }
+
     async function loadProducts() {
-        const response = await axios.get("http://localhost:8081/products")
+        const response = await axios.get("http://localhost:8081/products",config)
         console.log(response)
         setProducts(response.data)
     }
 
     useEffect(function() {
-        loadProducts()
+        if(isAuthenticated) {
+            loadProducts()
+        }
     },[])
 
     const [totalPrice,setTotalPrice] = useState<number>(0)
@@ -57,7 +69,7 @@ function CreateOrder() {
         try {
             const response = await axios.post("http://localhost:8081/orders",{
                 productIds : productIDs
-            })
+            },config)
             console.log(response)
             navigate("/order")
         } catch (error: any) {
@@ -66,7 +78,9 @@ function CreateOrder() {
     }
 
     return (
-        <div className="flex bg-gradient-to-r from-white to-slate-100">
+        <div className="bg-gradient-to-r from-white to-slate-100">
+            <NavBar />
+            <div className="flex">
             <div className="w-[500px] border-r">
                 <h1 className="text-rose-800 italic tracking-widest underline underline-offset-2 antialiased text-5xl m-5 font-thin block h-[40px]">Products</h1>
                 <div className="grid grid-cols-2">
@@ -124,6 +138,7 @@ function CreateOrder() {
                     </tbody>
                 </table>
                 <button className="border text-black mt-10 p-3 rounded-3xl ... ring-2 ring-blue-500/50 hover:bg-blue-300" onClick={submitOrder}>Place Order</button>
+            </div>
             </div>
         </div>
 
